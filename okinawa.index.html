@@ -13,7 +13,7 @@
         /* 🎨 日系極簡可愛風 / 沖繩海洋風格配色定義 */
         :root {
             --primary-blue: #66CCFF; /* 主色：海洋藍 */
-            --light-blue: #E0F7FF; /* 4. 網頁背景延伸色 (極淺藍) */
+            --light-blue: #E0F7FF; /* 網頁背景延伸色 (極淺藍) */
             --trip-date-bg: #40A4E0; /* 較深的藍，用於日期選中 */
             
             /* ICON 顏色差異化 */
@@ -84,9 +84,8 @@
             margin-bottom: 0.5rem;
             display: inline-block;
         }
-        /* 確保內容區域能滾動到最底部 */
         .page-content-wrapper {
-            padding-bottom: 80px; /* 給固定按鈕留出空間 */
+            padding-bottom: 80px; 
         }
     </style>
 </head>
@@ -167,8 +166,8 @@
                                     </span>
                                     <div @click="openGoogleMaps(item.name)" class="flex-grow cursor-pointer active:opacity-75">
                                         <p class="text-lg font-bold text-gray-800">{{ item.name }}</p>
-                                        <p v-if="item.openingHours" class="text-sm text-gray-600">🕘 營業/時間：{{ item.openingHours }}</p>
-                                        <p v-if="item.ticket" class="text-sm text-red-500">🎟️ 門票：{{ item.ticket }}</p>
+                                        <p v-if="item.openingHours" class="text-sm text-gray-600">🕘 時間：{{ item.openingHours }}</p>
+                                        <p v-if="item.ticket" class="text-sm text-red-500">🎟️ 費用/門票：{{ item.ticket }}</p>
                                         <p v-if="item.notes" class="text-sm text-gray-500 mt-1">📝 備註：{{ item.notes }}</p>
                                     </div>
                                     <button @click="editItem(item)" class="text-gray-400 hover:text-[var(--icon-itinerary)] ml-4 flex-shrink-0 p-1 rounded-full hover:bg-gray-100">
@@ -310,6 +309,7 @@
             components: { Draggable },
             setup() {
                 const activeTab = ref('itinerary');
+                // 確保預設選中日期
                 const selectedDate = ref('2026-01-03'); 
                 const isModalOpen = ref(false);
                 const modalContext = ref(''); 
@@ -337,26 +337,26 @@
                     feelsLike: 22, 
                 });
 
-                // *** 核心行程數據：根據您提供的最新資訊更新 ***
+                // *** 核心行程數據：這是您提供的完整行程 ***
                 const itinerary = ref([
                     // Day 1: 2026-01-03
-                    { id: 1, day: 'Day1', date: '2026-01-03', type: 'flight', name: '航班資訊 (KHH→OKA)', flightNumber: 'IT288', departureTime: '9:45', arrivalTime: '12:30', departureAirport: 'KHH', arrivalAirport: 'OKA', travelTime: null, transportation: null, notes: '請務必提前報到' },
-                    { id: 2, day: 'Day1', date: '2026-01-03', type: 'other', name: '機場寄行李/前往住宿', openingHours: '約13:00', ticket: null, notes: '寄行李或放回飯店後開始跑行程', travelTime: '30分', transportation: '大眾運輸' },
+                    { id: 1, day: 'Day1', date: '2026-01-03', type: 'flight', name: '航班資訊 (KHH→OKA)', flightNumber: 'IT288', departureTime: '9:45', arrivalTime: '12:30', departureAirport: 'KHH', arrivalAirport: 'OKA', travelTime: null, transportation: null, notes: '請務必提前報到，預計12:30抵達' },
+                    { id: 2, day: 'Day1', date: '2026-01-03', type: 'other', name: '機場寄行李', openingHours: '約 13:00', ticket: null, notes: '那霸機場2F, ゆいにちストリート (Before U Go)', travelTime: '30分', transportation: '步行' },
                     { id: 3, day: 'Day1', date: '2026-01-03', type: 'sightseeing', name: 'iias (DMM水族館) / 餵貓頭鷹', openingHours: '10:00-21:00', ticket: '水族館 2400 JPY', notes: '搭TK01/TK02 (13:32, 14:02) 可選', travelTime: '30分', transportation: '大眾運輸' },
-                    { id: 4, day: 'Day1', date: '2026-01-03', type: 'food', name: '瀨長島 幸福鬆餅', openingHours: '10:00-19:30', ticket: null, notes: '搭TK01/TK02，先拿號碼牌', travelTime: '20分', transportation: '大眾運輸' },
-                    { id: 5, day: 'Day1', date: '2026-01-03', type: 'food', name: '沖繩蝦蝦飯', openingHours: '11:00-21:00', ticket: null, notes: '瀨長島上，步行可達', travelTime: '10分', transportation: '步行' },
-                    { id: 6, day: 'Day1', date: '2026-01-03', type: 'food', name: '國際通晚餐: yakiniku horumon nakama', openingHours: '17:00-23:00', ticket: null, notes: '搭TK01/TK02回那霸市區', travelTime: '40分', transportation: '大眾運輸' },
+                    { id: 4, day: 'Day1', date: '2026-01-03', type: 'food', name: '瀨長島 幸福鬆餅', openingHours: '10:00-19:30', ticket: null, notes: '搭TK01/TK02前往，先拿號碼牌', travelTime: '20分', transportation: '大眾運輸' },
+                    { id: 5, day: 'Day1', date: '2026-01-03', type: 'food', name: '沖繩蝦蝦飯', openingHours: '11:00-21:00', ticket: null, notes: '瀨長島上，步行可達，可和鬆餅一起解決', travelTime: '10分', transportation: '步行' },
+                    { id: 6, day: 'Day1', date: '2026-01-03', type: 'food', name: '國際通晚餐: yakiniku horumon nakama', openingHours: '17:00-23:00', ticket: null, notes: '搭TK01/TK02回那霸市區國際通', travelTime: '40分', transportation: '大眾運輸' },
                     
                     // Day 2: 2026-01-04
-                    { id: 7, day: 'Day2', date: '2026-01-04', type: 'other', name: '飯店集合 (賞鯨行程)', openingHours: '7:30', ticket: null, notes: '賞鯨船業者於飯店集合', travelTime: '15分', transportation: '步行' }, 
-                    { id: 8, day: 'Day2', date: '2026-01-04', type: 'sightseeing', name: '賞鯨船', openingHours: '8:00出發', ticket: '約 6000 JPY', notes: '預計 13:00 結束並送回飯店', travelTime: '5分', transportation: '開車' },
-                    { id: 9, day: 'Day2', date: '2026-01-04', type: 'food', name: '美國村晚餐: steak88', openingHours: '11:00-22:00', ticket: null, notes: '從縣廳搭車前往', travelTime: '45分', transportation: '大眾運輸' },
+                    { id: 7, day: 'Day2', date: '2026-01-04', type: 'other', name: '賞鯨行程飯店集合', openingHours: '7:30', ticket: null, notes: '賞鯨船業者於飯店集合', travelTime: '15分', transportation: '步行' }, 
+                    { id: 8, day: 'Day2', date: '2026-01-04', type: 'sightseeing', name: '賞鯨船', openingHours: '8:00出發', ticket: '約 6000 JPY', notes: '預計 13:00 結束並送回飯店/縣廳', travelTime: '5分', transportation: '開車' },
+                    { id: 9, day: 'Day2', date: '2026-01-04', type: 'food', name: '美國村晚餐: steak88', openingHours: '11:00-22:00', ticket: null, notes: '從縣廳搭車前往美國村', travelTime: '45分', transportation: '大眾運輸' },
                     
                     // Day 3: 2026-01-05
                     { id: 10, day: 'Day3', date: '2026-01-05', type: 'sightseeing', name: '波上宮', openingHours: '9:00', ticket: null, notes: '9點開始販賣御守，預計11:00離開', travelTime: '15分', transportation: '步行' },
-                    { id: 11, day: 'Day3', date: '2026-01-05', type: 'food', name: '敘敘苑 (歌町站)', openingHours: '12:15 (預約)', ticket: null, notes: '步行至輕軌搭到歌町站', travelTime: '30分', transportation: '大眾運輸' },
-                    { id: 12, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Parco city', openingHours: '10:00-22:00', ticket: null, notes: '下午購物行程', travelTime: '15分', transportation: '開車' },
-                    { id: 13, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Aeon mall', openingHours: '10:00-22:00', ticket: null, notes: '或選擇 Aeon mall', travelTime: '10分', transportation: '開車' },
+                    { id: 11, day: 'Day3', date: '2026-01-05', type: 'food', name: '敘敘苑 (歌町站)', openingHours: '12:15', ticket: null, notes: '步行至輕軌搭到歌町站，午餐預約時間 12:15', travelTime: '30分', transportation: '大眾運輸' },
+                    { id: 12, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Parco city', openingHours: '10:00-22:00', ticket: null, notes: '下午購物行程 A', travelTime: '15分', transportation: '開車' },
+                    { id: 13, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Aeon mall', openingHours: '10:00-22:00', ticket: null, notes: '下午購物行程 B (二選一)', travelTime: '10分', transportation: '開車' },
                     
                     // Day 4: 2026-01-06
                     { id: 14, day: 'Day4', date: '2026-01-06', type: 'other', name: '離開飯店前往機場', openingHours: '9:00', ticket: null, notes: '建議9:00前整理完畢退房', travelTime: '30分', transportation: '大眾運輸' },
@@ -383,8 +383,8 @@
                             const dateObj = new Date(item.date);
                             dateMap[item.date] = {
                                 date: item.date,
-                                // 確保只顯示前四天，若行程超過四天，此處需調整
-                                dayOfWeek: item.day, // 直接使用 DayX
+                                // 將 day 欄位從 'Day1' 轉換為 '週六' 等格式
+                                dayOfWeek: item.day.replace('Day1', '週六').replace('Day2', '週日').replace('Day3', '週一').replace('Day4', '週二'), 
                                 dateNumber: dateObj.getDate(), 
                             };
                         }
@@ -443,8 +443,9 @@
                 }
 
                 const openGoogleMaps = (locationName) => {
+                    // 修正 Google Maps 網址，確保能開啟
                     const encodedName = encodeURIComponent(locationName);
-                    const mapUrl = `http://googleusercontent.com/maps.google.com/4{encodedName}&travelmode=driving`;
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodedName}`;
                     window.open(mapUrl, '_blank');
                 }
 
