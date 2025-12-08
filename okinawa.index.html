@@ -177,6 +177,11 @@
                             </div>
                         </template>
                     </draggable>
+                    
+                    <div v-if="filteredItinerary.length === 0" class="text-center p-8 bg-gray-50 rounded-xl shadow-inner text-gray-500">
+                        <p class="text-lg font-semibold">當日尚未規劃行程 🤔</p>
+                        <p class="text-sm mt-2">請點擊右下角按鈕新增項目</p>
+                    </div>
 
                     <button @click="openAddModal('itinerary', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--icon-itinerary)] text-white rounded-full shadow-xl hover:bg-blue-400 transition duration-300 z-50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -273,7 +278,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 10v-1m-7-5h10M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
                     </button>
                 </div>
-            </div> <div v-if="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            </div> <div v-if="isModalOpen" @click.self="isModalOpen = false" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                 <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
                     <h3 class="text-xl font-bold text-[var(--primary-blue)] mb-4">
                         {{ modalTitle }}
@@ -309,11 +314,6 @@
             components: { Draggable },
             setup() {
                 const activeTab = ref('itinerary');
-                // 確保預設選中日期
-                const selectedDate = ref('2026-01-03'); 
-                const isModalOpen = ref(false);
-                const modalContext = ref(''); 
-                const modalMode = ref('add'); 
 
                 const exchangeRate = 0.2210; 
                 const jpyAmount = ref(0);
@@ -363,6 +363,13 @@
                     { id: 15, day: 'Day4', date: '2026-01-06', type: 'flight', name: '航班資訊 (OKA→KHH)', flightNumber: 'SL391', departureTime: '11:50', arrivalTime: '12:40', departureAirport: 'OKA', arrivalAirport: 'KHH', travelTime: null, transportation: null, notes: '建議 9:30 前抵達機場' },
                 ]);
 
+                // *** 核心修正：確保 selectedDate 預設值為行程表中的第一個日期 ***
+                // 1. 抓取所有不重複的日期並排序
+                const uniqueDates = [...new Set(itinerary.value.map(item => item.date))].sort();
+                // 2. 使用第一個日期作為預設值
+                const initialDate = uniqueDates.length > 0 ? uniqueDates[0] : '2026-01-03';
+                const selectedDate = ref(initialDate);
+
                 const shoppingList = ref([
                     { id: 1, name: '紅芋蛋塔', image: null },
                     { id: 2, name: '雪鹽金楚糕', image: null },
@@ -373,6 +380,10 @@
                     { id: 2, category: '住宿', name: '飯店費用 (3晚)', date: '2026-01-03', amount: 10173, payment: '信用卡', notes: '台幣金額' },
                     { id: 3, category: '門票', name: 'DMM 水族館門票', date: '2026-01-03', amount: 580, payment: '現金', notes: '台幣金額' },
                 ]);
+
+                const isModalOpen = ref(false);
+                const modalContext = ref(''); 
+                const modalMode = ref('add'); 
 
                 // --- Computed 屬性 ---
                 
@@ -403,7 +414,7 @@
                          let newItinerary = itinerary.value.filter(item => item.date !== selectedDate.value); 
                          newItinerary.push(...newValue); 
                          
-                         // 重新排序整個列表以確保一致性
+                         // 重新排序整個列表以確保一致性 (這裡的 id 排序只是為了穩定性，不影響畫面)
                          itinerary.value = newItinerary.sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
                     }
                 });
@@ -443,7 +454,6 @@
                 }
 
                 const openGoogleMaps = (locationName) => {
-                    // 修正 Google Maps 網址，確保能開啟
                     const encodedName = encodeURIComponent(locationName);
                     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodedName}`;
                     window.open(mapUrl, '_blank');
