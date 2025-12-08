@@ -43,6 +43,19 @@
             z-index: 10;
         }
 
+        /* ICON 修正：將 Tab ICON 區域向上拉，確保不會被圓弧遮擋 */
+        .tab-nav {
+             position: absolute;
+             bottom: 0;
+             right: 0;
+             z-index: 30; /* 確保在圓弧和圖片上方 */
+             padding: 1rem;
+             display: flex;
+             gap: 0.5rem;
+             /* 調整 bottom 讓 ICON 浮在圖片和圓弧交界處 */
+             transform: translateY(-50%); 
+        }
+
         /* 5. 利用負邊距將下方的主內容區域向上拉動重疊 */
         .main-content {
             margin-top: -50px; 
@@ -75,7 +88,7 @@
             
             <div class="header-arc"></div>
 
-            <nav class="absolute bottom-0 right-0 z-30 p-4 flex space-x-2 translate-y-1/2">
+            <nav class="tab-nav">
                 <button @click="activeTab = 'itinerary'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--primary-blue)] scale-110 shadow-xl': activeTab === 'itinerary', 'text-gray-400': activeTab !== 'itinerary'}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </button>
@@ -239,9 +252,9 @@
                 <h2 class="text-2xl font-extrabold text-[var(--primary-blue)] mb-4">💰 花費紀錄</h2>
 
                 <div class="bg-red-50 p-4 rounded-xl mb-6 border border-red-400 text-center shadow-md">
-                    <p class="text-sm font-semibold text-gray-600">總花費 (JPY)</p>
-                    <p class="text-3xl font-bold text-red-600">{{ totalExpenses.toLocaleString() }} JPY</p>
-                    <p class="text-sm text-gray-500 mt-1">約 {{ (totalExpenses * exchangeRate).toFixed(0).toLocaleString() }} TWD</p>
+                    <p class="text-sm font-semibold text-gray-600">總花費 (TWD)</p>
+                    <p class="text-3xl font-bold text-red-600">{{ totalTWDExpenses.toLocaleString() }} TWD</p>
+                    <p class="text-sm text-gray-500 mt-1">（日幣金額約 {{ (totalTWDExpenses / exchangeRate).toFixed(0).toLocaleString() }} JPY）</p>
                 </div>
 
                 <div class="space-y-3">
@@ -251,7 +264,7 @@
                             <p class="text-xs text-gray-500">{{ expense.date }} | {{ expense.category }} ({{ expense.payment }})</p>
                              <p v-if="expense.notes" class="text-xs text-gray-400">備註: {{ expense.notes }}</p>
                         </div>
-                        <p class="font-bold text-lg text-red-500">{{ expense.amount.toLocaleString() }} JPY</p>
+                        <p class="font-bold text-lg text-red-500">{{ expense.amount.toLocaleString() }} TWD</p>
                     </div>
                 </div>
 
@@ -290,8 +303,8 @@
                 const activeTab = ref('itinerary');
                 const selectedDate = ref('2026-01-03'); 
                 const isModalOpen = ref(false);
-                const modalContext = ref(''); // 判斷是哪個分頁的 Modal (itinerary, shopping, expenses)
-                const modalMode = ref('add'); // 'add' or 'edit'
+                const modalContext = ref(''); 
+                const modalMode = ref('add'); 
                 const filterCategory = ref('');
                 
                 // --- 數據狀態 ---
@@ -300,7 +313,7 @@
                 const twdAmount = computed(() => jpyAmount.value * exchangeRate);
 
                 const flightInfo = ref({
-                    status: '準點', // 模擬航班動態
+                    status: '準點', 
                     outbound: { date: '2026/01/03', departureAirport: 'KHH', arrivalAirport: 'OKA', flightNumber: 'IT288', departureTime: '9:45', arrivalTime: '12:30', duration: '1小時45分' },
                     return: { date: '2026/01/06', departureAirport: 'OKA', arrivalAirport: 'KHH', flightNumber: 'SL391', departureTime: '11:50', arrivalTime: '12:40', duration: '0小時50分' },
                 });
@@ -317,7 +330,7 @@
                     feelsLike: 22, 
                 });
 
-                // 核心行程數據 (Day1 航班已標記 type: 'flight')
+                // 核心行程數據
                 const itinerary = ref([
                     { id: 1, day: 'Day1', date: '2026-01-03', type: 'flight', name: '航班資訊 (KHH→OKA)', flightNumber: 'IT288', departureTime: '9:45', arrivalTime: '12:30', departureAirport: 'KHH', arrivalAirport: 'OKA', travelTime: null, transportation: null, notes: '請務必提前報到' },
                     { id: 2, day: 'Day1', date: '2026-01-03', type: 'other', name: '機場寄行李 (Before U Go)', openingHours: '10:00-19:00', ticket: null, notes: '那霸機場2F, ゆいにちストリート', travelTime: '15分', transportation: '步行' },
@@ -326,7 +339,7 @@
                     { id: 5, day: 'Day1', date: '2026-01-03', type: 'food', name: '沖繩蝦蝦飯', openingHours: '11:00-21:00', ticket: null, notes: '搭TK01/02', travelTime: '10分', transportation: '步行' },
                     { id: 6, day: 'Day1', date: '2026-01-03', type: 'food', name: '國際通晚餐: yakiniku horumon nakama', openingHours: '17:00-23:00', ticket: null, notes: '搭TK01/02', travelTime: '30分', transportation: '大眾運輸' },
                     
-                    { id: 7, day: 'Day2', date: '2026-01-04', type: 'other', name: '飯店集合 (賞鯨)', openingHours: '7:30', ticket: null, notes: '7:30飯店集合', travelTime: '15分', transportation: '步行' }, // 交通時間以前一日住宿計算
+                    { id: 7, day: 'Day2', date: '2026-01-04', type: 'other', name: '飯店集合 (賞鯨)', openingHours: '7:30', ticket: null, notes: '7:30飯店集合', travelTime: '15分', transportation: '步行' }, 
                     { id: 8, day: 'Day2', date: '2026-01-04', type: 'sightseeing', name: '賞鯨船', openingHours: '8:00出發', ticket: '6000 JPY', notes: '13:00結束', travelTime: '25分', transportation: '大眾運輸' },
                     { id: 9, day: 'Day2', date: '2026-01-04', type: 'food', name: '美國村晚餐: steak88', openingHours: '11:00-22:00', ticket: null, notes: '縣廳搭車', travelTime: '45分', transportation: '開車' },
                     
@@ -344,16 +357,19 @@
                     { id: 2, name: '雪鹽金楚糕', image: null },
                 ]);
 
+                // *** 花費數據修正：使用台幣金額，並移除午餐花費 ***
                 const expenses = ref([
-                    { id: 1, category: '機票', name: '機票費用 (往返)', date: '2026-01-03', amount: 80000, payment: '信用卡', notes: 'TWD 17680' },
-                    { id: 2, category: '住宿', name: '飯店費用 (3晚)', date: '2026-01-03', amount: 35000, payment: '信用卡', notes: null },
-                    { id: 3, category: '飲食', name: '午餐 DMM 水族館', date: '2026-01-03', amount: 2500, payment: '現金', notes: null },
-                    { id: 4, category: '門票', name: 'DMM 水族館門票', date: '2026-01-03', amount: 2400, payment: '現金', notes: null },
+                    // 1. 機票：27448 TWD
+                    { id: 1, category: '機票', name: '機票費用 (往返)', date: '2026-01-03', amount: 27448, payment: '信用卡', notes: '台幣金額' },
+                    // 2. 住宿：10173 TWD
+                    { id: 2, category: '住宿', name: '飯店費用 (3晚)', date: '2026-01-03', amount: 10173, payment: '信用卡', notes: '台幣金額' },
+                    // 3. 門票：580 TWD
+                    { id: 3, category: '門票', name: 'DMM 水族館門票', date: '2026-01-03', amount: 580, payment: '現金', notes: '台幣金額' },
+                    // 4. 午餐已移除
                 ]);
 
                 // --- Computed 屬性 ---
                 
-                // 根據行程資訊生成日期選單 (1. 星期＋日期)
                 const days = computed(() => {
                     const dateMap = {};
                     itinerary.value.forEach(item => {
@@ -361,15 +377,14 @@
                             const dateObj = new Date(item.date);
                             dateMap[item.date] = {
                                 date: item.date,
-                                dayOfWeek: dateObj.toLocaleDateString('en-US', { weekday: 'short' }), // Fri
-                                dateNumber: dateObj.getDate(), // 3, 4, 5, 6
+                                dayOfWeek: dateObj.toLocaleDateString('en-US', { weekday: 'short' }),
+                                dateNumber: dateObj.getDate(), 
                             };
                         }
                     });
                     return Object.values(dateMap).sort((a, b) => new Date(a.date) - new Date(b.date));
                 });
                 
-                // 篩選當前選擇日期的行程 (包含 (2) 分類篩選)
                 const filteredItinerary = computed({
                     get() {
                         let filtered = itinerary.value.filter(item => item.date === selectedDate.value);
@@ -379,17 +394,16 @@
                         return filtered;
                     },
                     set(newValue) {
-                         // 當 draggable 改變順序時，更新原數據 (確保拖曳生效)
                          itinerary.value = itinerary.value.map(item => {
                             const updatedItem = newValue.find(ni => ni.id === item.id);
-                            return updatedItem || item; // 找到就替換，找不到保持原樣
+                            return updatedItem || item; 
                         });
                     }
                 });
 
 
-                // 總花費計算
-                const totalExpenses = computed(() => {
+                // 總花費計算 (總台幣 TWD)
+                const totalTWDExpenses = computed(() => {
                     return expenses.value.reduce((sum, item) => sum + item.amount, 0);
                 });
 
@@ -407,7 +421,6 @@
 
                 // --- 函數 (Methods) ---
                 
-                // (6) 交通圖示輔助函數
                 const transportationIcon = (type) => {
                     switch (type) {
                         case '步行': return '🚶';
@@ -417,37 +430,31 @@
                     }
                 }
 
-                // (9) Google Maps 導航功能
                 const openGoogleMaps = (locationName) => {
-                    // 使用 Google Maps 查詢 URL，實現點擊跳轉功能
+                    // 使用 Google Maps 查詢 URL
                     const encodedName = encodeURIComponent(locationName);
-                    const mapUrl = `http://maps.google.com/?q=${encodedName}&travelmode=driving`;
+                    const mapUrl = `http://googleusercontent.com/maps.google.com/3{encodedName}&travelmode=driving`;
                     window.open(mapUrl, '_blank');
                 }
 
-                // (3) 彈出視窗開啟
                 const openAddModal = (context, mode = 'add') => { 
                     modalContext.value = context;
                     modalMode.value = mode;
                     isModalOpen.value = true;
                 }
                 const editItem = (item) => { 
-                    // 這裡需要將 item 數據載入到 modal 內的表單中
-                    modalContext.value = item.type; // 判斷行程類型
+                    modalContext.value = item.type; 
                     modalMode.value = 'edit';
                     isModalOpen.value = true; 
                 }
 
-                // (3) 刪除確認機制
                 const confirmDelete = () => {
                     if (confirm('確定要永久刪除此項目嗎？此操作無法撤銷！')) {
-                        // 這裡需要實作實際的刪除邏輯，根據 modalContext 和當前編輯的項目 ID 進行刪除
                         alert('項目已刪除 (模擬)');
                         isModalOpen.value = false;
                     }
                 }
                 
-                // 模擬購物清單刪除 (簡單版)
                 const deleteItem = (id, context) => {
                     if (confirm('確定要刪除此項目嗎？')) {
                         if (context === 'shopping') {
@@ -471,7 +478,7 @@
                     filteredItinerary,
                     shoppingList,
                     expenses,
-                    totalExpenses,
+                    totalTWDExpenses, // 使用新的總花費
                     exchangeRate,
                     jpyAmount,
                     twdAmount,
