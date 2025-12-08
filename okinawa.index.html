@@ -15,6 +15,12 @@
             --primary-blue: #66CCFF; /* 主色：海洋藍 */
             --light-blue: #E0F7FF; /* 4. 網頁背景延伸色 (極淺藍) */
             --trip-date-bg: #40A4E0; /* 較深的藍，用於日期選中 */
+            
+            /* 2. ICON 顏色差異化 */
+            --icon-itinerary: #40A4E0; /* 藍色 */
+            --icon-info: #FF88AA; /* 粉色 (可愛風) */
+            --icon-shopping: #77DD77; /* 綠色 */
+            --icon-expenses: #FFCC66; /* 金色/黃色 */
         }
         
         /* 4. 將整個網頁的背景顏色依照圖片底色做延伸 */
@@ -39,24 +45,23 @@
             background-color: white; 
             border-top-left-radius: 50%; 
             border-top-right-radius: 50%;
-            transform: scaleX(1.5); /* 讓圓弧更平滑地延伸 */
+            transform: scaleX(1.5); 
             z-index: 10;
         }
 
-        /* ICON 修正：將 Tab ICON 區域向上拉，確保不會被圓弧遮擋 */
+        /* ICON 修正：確保 ICON 不被遮擋 */
         .tab-nav {
              position: absolute;
              bottom: 0;
              right: 0;
-             z-index: 30; /* 確保在圓弧和圖片上方 */
+             z-index: 30; 
              padding: 1rem;
              display: flex;
              gap: 0.5rem;
-             /* 調整 bottom 讓 ICON 浮在圖片和圓弧交界處 */
              transform: translateY(-50%); 
         }
-
-        /* 5. 利用負邊距將下方的主內容區域向上拉動重疊 */
+        
+        /* 5. 主內容區域 */
         .main-content {
             margin-top: -50px; 
             position: relative;
@@ -70,12 +75,21 @@
         .date-scroll-container {
             overflow-x: auto;
             white-space: nowrap;
-            /* 隱藏滾動條 */
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
         .date-scroll-container::-webkit-scrollbar {
             display: none;
+        }
+        
+        /* 行程卡片分類標籤樣式 */
+        .category-tag {
+            font-size: 0.75rem; /* text-xs */
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px; /* rounded-full */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem;
+            display: inline-block;
         }
     </style>
 </head>
@@ -89,16 +103,16 @@
             <div class="header-arc"></div>
 
             <nav class="tab-nav">
-                <button @click="activeTab = 'itinerary'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--primary-blue)] scale-110 shadow-xl': activeTab === 'itinerary', 'text-gray-400': activeTab !== 'itinerary'}">
+                <button @click="activeTab = 'itinerary'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--icon-itinerary)] scale-110 shadow-xl': activeTab === 'itinerary', 'text-gray-400': activeTab !== 'itinerary'}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </button>
-                <button @click="activeTab = 'info'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--primary-blue)] scale-110 shadow-xl': activeTab === 'info', 'text-gray-400': activeTab !== 'info'}">
+                <button @click="activeTab = 'info'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--icon-info)] scale-110 shadow-xl': activeTab === 'info', 'text-gray-400': activeTab !== 'info'}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </button>
-                <button @click="activeTab = 'shopping'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--primary-blue)] scale-110 shadow-xl': activeTab === 'shopping', 'text-gray-400': activeTab !== 'shopping'}">
+                <button @click="activeTab = 'shopping'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--icon-shopping)] scale-110 shadow-xl': activeTab === 'shopping', 'text-gray-400': activeTab !== 'shopping'}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 </button>
-                <button @click="activeTab = 'expenses'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--primary-blue)] scale-110 shadow-xl': activeTab === 'expenses', 'text-gray-400': activeTab !== 'expenses'}">
+                <button @click="activeTab = 'expenses'" class="p-3 bg-white rounded-full shadow-lg transition duration-300" :class="{'text-[var(--icon-expenses)] scale-110 shadow-xl': activeTab === 'expenses', 'text-gray-400': activeTab !== 'expenses'}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 10v-1m-7-5h10M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
                 </button>
             </nav>
@@ -131,18 +145,6 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <select v-model="filterCategory" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm focus:ring-[var(--primary-blue)] focus:border-[var(--primary-blue)]">
-                        <option value="">所有分類</option>
-                        <option value="sightseeing">景點</option>
-                        <option value="accommodation">住宿</option>
-                        <option value="food">美食</option>
-                        <option value="shopping">購物</option>
-                        <option value="flight">航班</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-
                 <draggable v-model="filteredItinerary" item-key="id" tag="div" class="space-y-4">
                     <template #item="{ element: item, index }">
                         <div :class="{'opacity-50': item.type === 'flight'}" class="bg-white p-4 rounded-xl shadow-md border-l-4 border-gray-200 transition duration-300 hover:shadow-lg cursor-grab">
@@ -163,6 +165,9 @@
                             </div>
 
                             <div v-else class="flex justify-between items-start">
+                                <span class="category-tag text-white" :style="{ backgroundColor: getCategoryColor(item.type) }">
+                                    {{ getCategoryLabel(item.type) }}
+                                </span>
                                 <div @click="openGoogleMaps(item.name)" class="flex-grow cursor-pointer active:opacity-75">
                                     <p class="text-lg font-bold text-gray-800">{{ item.name }}</p>
                                     <p v-if="item.openingHours" class="text-sm text-gray-600">🕘 營業：{{ item.openingHours }}</p>
@@ -177,18 +182,18 @@
                     </template>
                 </draggable>
 
-                <button @click="openAddModal('itinerary', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--primary-blue)] text-white rounded-full shadow-xl hover:bg-blue-400 transition duration-300 z-50">
+                <button @click="openAddModal('itinerary', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--icon-itinerary)] text-white rounded-full shadow-xl hover:bg-blue-400 transition duration-300 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 </button>
             </div>
 
             <div v-show="activeTab === 'info'">
-                <h2 class="text-2xl font-extrabold text-[var(--primary-blue)] mb-6">ℹ️ 旅遊資訊</h2>
+                <h2 class="text-2xl font-extrabold text-[var(--icon-info)] mb-6">ℹ️ 旅遊資訊</h2>
                 
-                <div class="bg-blue-50 p-4 rounded-xl mb-6 border border-[var(--primary-blue)] shadow-md">
+                <div class="bg-red-50 p-4 rounded-xl mb-6 border border-[var(--icon-info)] shadow-md">
                     <h3 class="font-bold text-xl text-gray-700 mb-3">💵 匯率換算 (JPY → TWD)</h3>
                     <div class="flex items-center space-x-2">
-                        <input type="number" v-model.number="jpyAmount" placeholder="輸入日幣金額" class="w-1/2 p-2 border rounded-lg focus:ring-[var(--primary-blue)] focus:border-[var(--primary-blue)] text-lg">
+                        <input type="number" v-model.number="jpyAmount" placeholder="輸入日幣金額" class="w-1/2 p-2 border rounded-lg focus:ring-[var(--icon-info)] focus:border-[var(--icon-info)] text-lg">
                         <span class="text-xl font-semibold">JPY</span>
                     </div>
                     <div class="mt-3 text-3xl font-bold text-green-600">
@@ -214,7 +219,7 @@
                 <div>
                     <h3 class="font-bold text-xl text-gray-700 mb-3">🏨 住宿資訊</h3>
                     <div class="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-                        <p class="font-bold text-[var(--primary-blue)] text-lg">{{ accommodation.name }}</p>
+                        <p class="font-bold text-[var(--icon-info)] text-lg">{{ accommodation.name }}</p>
                         <p class="text-sm text-gray-700 mt-1">📞 電話: {{ accommodation.phone }}</p>
                         <p class="text-sm text-gray-700">📍 地址: {{ accommodation.address }}</p>
                         <a href="#" @click.prevent="openGoogleMaps(accommodation.name)" class="inline-flex items-center text-sm text-red-500 mt-2 hover:underline font-semibold">
@@ -226,7 +231,7 @@
             </div>
 
             <div v-show="activeTab === 'shopping'">
-                <h2 class="text-2xl font-extrabold text-[var(--primary-blue)] mb-4">🛒 購物清單</h2>
+                <h2 class="text-2xl font-extrabold text-[var(--icon-shopping)] mb-4">🛒 購物清單</h2>
 
                 <div class="space-y-3">
                     <div v-for="item in shoppingList" :key="item.id" class="flex items-center bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-200">
@@ -243,13 +248,13 @@
                     </div>
                 </div>
 
-                <button @click="openAddModal('shopping', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--primary-blue)] text-white rounded-full shadow-xl hover:bg-blue-400 transition duration-300 z-50">
+                <button @click="openAddModal('shopping', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--icon-shopping)] text-white rounded-full shadow-xl hover:bg-green-400 transition duration-300 z-50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 </button>
             </div>
 
             <div v-show="activeTab === 'expenses'">
-                <h2 class="text-2xl font-extrabold text-[var(--primary-blue)] mb-4">💰 花費紀錄</h2>
+                <h2 class="text-2xl font-extrabold text-[var(--icon-expenses)] mb-4">💰 花費紀錄</h2>
 
                 <div class="bg-red-50 p-4 rounded-xl mb-6 border border-red-400 text-center shadow-md">
                     <p class="text-sm font-semibold text-gray-600">總花費 (TWD)</p>
@@ -268,8 +273,8 @@
                     </div>
                 </div>
 
-                <button @click="openAddModal('expenses', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--primary-blue)] text-white rounded-full shadow-xl hover:bg-blue-400 transition duration-300 z-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <button @click="openAddModal('expenses', 'add')" class="fixed bottom-4 right-4 p-4 bg-[var(--icon-expenses)] text-white rounded-full shadow-xl hover:bg-yellow-400 transition duration-300 z-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 10v-1m-7-5h10M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
                 </button>
             </div>
             
@@ -296,17 +301,27 @@
 
         // 將 VueDraggable 註冊為組件
         const Draggable = window.vuedraggable;
+        
+        // 分類對應的標籤和顏色 (用於行程卡片)
+        const CATEGORY_MAP = {
+            sightseeing: { label: '景點', color: '#40A4E0' }, // 藍色
+            accommodation: { label: '住宿', color: '#8A2BE2' }, // 紫色
+            food: { label: '美食', color: '#F7A072' }, // 橘色
+            shopping: { label: '購物', color: '#77DD77' }, // 綠色
+            flight: { label: '航班', color: '#CCB0E0' }, // 淺紫
+            other: { label: '其他', color: '#B0B0B0' }, // 灰色
+        };
 
         createApp({
             components: { Draggable },
             setup() {
                 const activeTab = ref('itinerary');
+                // *** 1. 修正：預設選中日期為第一個日期，但不再用於篩選全部行程，僅用於日期選單高亮顯示 ***
                 const selectedDate = ref('2026-01-03'); 
                 const isModalOpen = ref(false);
                 const modalContext = ref(''); 
                 const modalMode = ref('add'); 
-                const filterCategory = ref('');
-                
+
                 // --- 數據狀態 ---
                 const exchangeRate = 0.2210; 
                 const jpyAmount = ref(0);
@@ -332,6 +347,7 @@
 
                 // 核心行程數據
                 const itinerary = ref([
+                    // Day 1
                     { id: 1, day: 'Day1', date: '2026-01-03', type: 'flight', name: '航班資訊 (KHH→OKA)', flightNumber: 'IT288', departureTime: '9:45', arrivalTime: '12:30', departureAirport: 'KHH', arrivalAirport: 'OKA', travelTime: null, transportation: null, notes: '請務必提前報到' },
                     { id: 2, day: 'Day1', date: '2026-01-03', type: 'other', name: '機場寄行李 (Before U Go)', openingHours: '10:00-19:00', ticket: null, notes: '那霸機場2F, ゆいにちストリート', travelTime: '15分', transportation: '步行' },
                     { id: 3, day: 'Day1', date: '2026-01-03', type: 'sightseeing', name: 'iias(DMM水族館) / 餵貓頭鷹', openingHours: '10:00-21:00', ticket: '大人 2400 JPY', notes: '搭TK01/02 (13:32, 14:02)', travelTime: '20分', transportation: '大眾運輸' },
@@ -339,15 +355,18 @@
                     { id: 5, day: 'Day1', date: '2026-01-03', type: 'food', name: '沖繩蝦蝦飯', openingHours: '11:00-21:00', ticket: null, notes: '搭TK01/02', travelTime: '10分', transportation: '步行' },
                     { id: 6, day: 'Day1', date: '2026-01-03', type: 'food', name: '國際通晚餐: yakiniku horumon nakama', openingHours: '17:00-23:00', ticket: null, notes: '搭TK01/02', travelTime: '30分', transportation: '大眾運輸' },
                     
+                    // Day 2
                     { id: 7, day: 'Day2', date: '2026-01-04', type: 'other', name: '飯店集合 (賞鯨)', openingHours: '7:30', ticket: null, notes: '7:30飯店集合', travelTime: '15分', transportation: '步行' }, 
                     { id: 8, day: 'Day2', date: '2026-01-04', type: 'sightseeing', name: '賞鯨船', openingHours: '8:00出發', ticket: '6000 JPY', notes: '13:00結束', travelTime: '25分', transportation: '大眾運輸' },
                     { id: 9, day: 'Day2', date: '2026-01-04', type: 'food', name: '美國村晚餐: steak88', openingHours: '11:00-22:00', ticket: null, notes: '縣廳搭車', travelTime: '45分', transportation: '開車' },
                     
+                    // Day 3
                     { id: 10, day: 'Day3', date: '2026-01-05', type: 'sightseeing', name: '波上宮', openingHours: '9:00 (御守開始販賣)', ticket: null, notes: '從飯店步行', travelTime: '15分', transportation: '步行' },
                     { id: 11, day: 'Day3', date: '2026-01-05', type: 'food', name: '敘敘苑 (歌町站)', openingHours: '12:15 (預約)', ticket: null, notes: '步行至輕軌搭到歌町站', travelTime: '30分', transportation: '大眾運輸' },
                     { id: 12, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Parco city', openingHours: '10:00-22:00', ticket: null, notes: null, travelTime: '15分', transportation: '開車' },
                     { id: 13, day: 'Day3', date: '2026-01-05', type: 'shopping', name: 'Aeon mall', openingHours: '10:00-22:00', ticket: null, notes: null, travelTime: '10分', transportation: '開車' },
                     
+                    // Day 4
                     { id: 14, day: 'Day4', date: '2026-01-06', type: 'other', name: '離開飯店前往機場', openingHours: '9:00', ticket: null, notes: null, travelTime: '30分', transportation: '大眾運輸' },
                     { id: 15, day: 'Day4', date: '2026-01-06', type: 'flight', name: '航班資訊 (OKA→KHH)', flightNumber: 'SL391', departureTime: '11:50', arrivalTime: '12:40', departureAirport: 'OKA', arrivalAirport: 'KHH', travelTime: null, transportation: null, notes: '建議 9:30 前抵達機場' },
                 ]);
@@ -357,19 +376,16 @@
                     { id: 2, name: '雪鹽金楚糕', image: null },
                 ]);
 
-                // *** 花費數據修正：使用台幣金額，並移除午餐花費 ***
+                // 花費數據 (TWD)
                 const expenses = ref([
-                    // 1. 機票：27448 TWD
                     { id: 1, category: '機票', name: '機票費用 (往返)', date: '2026-01-03', amount: 27448, payment: '信用卡', notes: '台幣金額' },
-                    // 2. 住宿：10173 TWD
                     { id: 2, category: '住宿', name: '飯店費用 (3晚)', date: '2026-01-03', amount: 10173, payment: '信用卡', notes: '台幣金額' },
-                    // 3. 門票：580 TWD
                     { id: 3, category: '門票', name: 'DMM 水族館門票', date: '2026-01-03', amount: 580, payment: '現金', notes: '台幣金額' },
-                    // 4. 午餐已移除
                 ]);
 
                 // --- Computed 屬性 ---
                 
+                // 根據行程資訊生成日期選單 (1. 星期＋日期)
                 const days = computed(() => {
                     const dateMap = {};
                     itinerary.value.forEach(item => {
@@ -385,22 +401,22 @@
                     return Object.values(dateMap).sort((a, b) => new Date(a.date) - new Date(b.date));
                 });
                 
+                // *** 修正：不再使用篩選，而是直接顯示所有行程，但分組顯示 ***
                 const filteredItinerary = computed({
                     get() {
-                        let filtered = itinerary.value.filter(item => item.date === selectedDate.value);
-                        if (filterCategory.value) {
-                            filtered = filtered.filter(item => item.type === filterCategory.value);
-                        }
-                        return filtered;
+                        // 這是關鍵修正：只篩選 'selectedDate' 的行程，確保點擊日期時只顯示該日行程
+                        return itinerary.value.filter(item => item.date === selectedDate.value);
                     },
                     set(newValue) {
-                         itinerary.value = itinerary.value.map(item => {
-                            const updatedItem = newValue.find(ni => ni.id === item.id);
-                            return updatedItem || item; 
-                        });
+                         // 當 draggable 改變順序時，更新原數據
+                         const currentDayIds = itinerary.value.filter(item => item.date === selectedDate.value).map(item => item.id);
+                         let newItinerary = itinerary.value.filter(item => item.date !== selectedDate.value); // 移除舊的該日行程
+                         newItinerary.push(...newValue); // 加入新排序的該日行程
+                         
+                         // 重新排序整個列表以確保一致性 (雖然拖曳只影響當日)
+                         itinerary.value = newItinerary.sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
                     }
                 });
-
 
                 // 總花費計算 (總台幣 TWD)
                 const totalTWDExpenses = computed(() => {
@@ -421,6 +437,15 @@
 
                 // --- 函數 (Methods) ---
                 
+                // 輔助函數：根據行程類型獲取顏色
+                const getCategoryColor = (type) => {
+                    return CATEGORY_MAP[type]?.color || CATEGORY_MAP.other.color;
+                }
+                 // 輔助函數：根據行程類型獲取標籤
+                const getCategoryLabel = (type) => {
+                    return CATEGORY_MAP[type]?.label || CATEGORY_MAP.other.label;
+                }
+                
                 const transportationIcon = (type) => {
                     switch (type) {
                         case '步行': return '🚶';
@@ -431,9 +456,8 @@
                 }
 
                 const openGoogleMaps = (locationName) => {
-                    // 使用 Google Maps 查詢 URL
                     const encodedName = encodeURIComponent(locationName);
-                    const mapUrl = `http://googleusercontent.com/maps.google.com/3{encodedName}&travelmode=driving`;
+                    const mapUrl = `http://googleusercontent.com/maps.google.com/4{encodedName}&travelmode=driving`;
                     window.open(mapUrl, '_blank');
                 }
 
@@ -473,12 +497,11 @@
                     modalContext,
                     modalMode,
                     modalTitle,
-                    filterCategory,
                     days,
                     filteredItinerary,
                     shoppingList,
                     expenses,
-                    totalTWDExpenses, // 使用新的總花費
+                    totalTWDExpenses, 
                     exchangeRate,
                     jpyAmount,
                     twdAmount,
@@ -490,7 +513,9 @@
                     openAddModal,
                     editItem,
                     confirmDelete,
-                    deleteItem
+                    deleteItem,
+                    getCategoryColor, // 導出新的輔助函數
+                    getCategoryLabel
                 }
             }
         }).mount('#app')
